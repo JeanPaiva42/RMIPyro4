@@ -1,6 +1,14 @@
 import pessoa
 import Pyro4
 import json
+import threading
+
+def startServer():
+	Pyro4.Daemon.serveSimple(
+		    {
+		        Filial: "example.filial"
+		    },
+		host="127.0.0.1", port=8000, ns=True, verbose=True)
 
 @Pyro4.expose
 #@Pyro4.behavior(instance_mode="single")
@@ -102,13 +110,11 @@ class Filial(object):
         self.servidor.oi()
 
 def main():
-    Pyro4.Daemon.serveSimple(
-            {
-                Filial: "example.filial"
-            },
-        host="127.0.0.1", port=8000, ns=False, verbose=True)
-
-    '''filial = Filial()
+    
+    
+    t = threading.Thread(target=startServer)
+    t.start()
+    filial = Filial()
     filial.cadastraPessoa("A", 22)
     filial.cadastraPessoa("b", 22)
     filial.cadastraPessoa("c", 22)
@@ -120,7 +126,6 @@ def main():
     filial.devolve("aa",22)
     print(filial.debitos)
     filial.saveJson()
-'''
 
 if __name__=="__main__":
     main()

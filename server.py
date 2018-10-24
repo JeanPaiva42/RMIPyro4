@@ -1,5 +1,13 @@
 import Pyro4
 import json
+import threading
+
+def startServer():
+	Pyro4.Daemon.serveSimple(
+		    {
+		        Server: "example.servidor"
+		    },
+		host="127.0.0.1", port=8000, ns=True, verbose=True)
 @Pyro4.expose
 @Pyro4.behavior(instance_mode="single")
 class Server(object):
@@ -93,11 +101,8 @@ class Server(object):
         print('koe')
 
 def main():
-    Pyro4.Daemon.serveSimple(
-        {
-            Server: "example.servidor"
-        },
-    host = "127.0.0.1", port = 8080, ns = False, verbose = True)
+    t = threading.Thread(target=startServer)
+    t.start()
     print("Conectado")
 
 if __name__ == "__main__":
