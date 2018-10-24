@@ -27,9 +27,9 @@ class Server(object):
             self.uri = self.enderecos['1']
             self.filial = Pyro4.Proxy(self.uri)
             self.uri2 = self.enderecos['2']
-            self.filial2 = Pyro4.Proxy(self.uri)
+            self.filial2 = Pyro4.Proxy(self.uri2)
             self.uri3 = self.enderecos['3']
-            self.filial3 = Pyro4.Proxy(self.uri)
+            self.filial3 = Pyro4.Proxy(self.uri3)
             self.ready = True
         print("Procurando debitos")
         for i in self.cadastrados:
@@ -51,9 +51,9 @@ class Server(object):
             self.uri = self.enderecos['1']
             self.filial = Pyro4.Proxy(self.uri)
             self.uri2 = self.enderecos['2']
-            self.filial2 = Pyro4.Proxy(self.uri)
+            self.filial2 = Pyro4.Proxy(self.uri2)
             self.uri3 = self.enderecos['3']
-            self.filial3 = Pyro4.Proxy(self.uri)
+            self.filial3 = Pyro4.Proxy(self.uri3)
             self.ready = True
         print("Novo cadastro efetuado no servidor")
         pass
@@ -65,9 +65,9 @@ class Server(object):
             self.uri = self.enderecos['1']
             self.filial = Pyro4.Proxy(self.uri)
             self.uri2 = self.enderecos['2']
-            self.filial2 = Pyro4.Proxy(self.uri)
+            self.filial2 = Pyro4.Proxy(self.uri2)
             self.uri3 = self.enderecos['3']
-            self.filial3 = Pyro4.Proxy(self.uri)
+            self.filial3 = Pyro4.Proxy(self.uri3)
             self.ready = True
         print("Procurando debitos")
         for i in self.cadastrados:
