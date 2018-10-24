@@ -13,11 +13,13 @@ class Filial(object):
         self.pessoas = []
         self.debitos = []
     def cadastraPessoa(self, nome, numero):
-            self.pessoas.append(pessoa.Pessoa(nome,numero))
+            #self.pessoas.append(pessoa.Pessoa(nome,numero))
+            self.pessoas.append({"nome": nome, "numero":numero})
+            print("dado cadastrado")
 
     def aluga(self, nome, numero):
         for i in self.pessoas:
-            if i.getNome() == nome and i.getNumero() == numero:
+            if i['nome'] == nome and i['numero'] == numero and (self.consultaDebito(i['nome'],i['numero']) == False):
                 d = {}
                 d['cliente'] = i
                 d['debito'] = True
@@ -27,7 +29,7 @@ class Filial(object):
 
     def procuraCliente(self, nome, numero):
         for i in self.pessoas:
-            if i.getNome() == nome and i.getNumero() == numero:
+            if i['nome'] == nome and i['numero'] == numero:
                 return i
         return None
 
@@ -62,12 +64,19 @@ class Filial(object):
         with open("pessoas.json", "w") as write_file:
             write_file.write(json.encode(self.pessoas))
 
+    def getVeiculos(self):
+        return self.veiculos
+    def getPessoas(self):
+        return self.pessoas
+    def getDebitos(self):
+        return self.debitos
+
 def main():
     Pyro4.Daemon.serveSimple(
             {
                 Filial: "example.filial"
             },
-            ns = True)
+            ns = False)
 
 if __name__=="__main__":
     main()
