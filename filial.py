@@ -15,8 +15,10 @@ class Filial(object):
         self.veiculos = ['fusca', 'opala', 'ogromovel']
         self.loadJson()
         self.id = '1'
-        self.uri = "PYRO:example.servidor@localhost:61443"
+        self.uri = "PYRO:example.servidor@127.0.0.1:8080"
         self.servidor = Pyro4.Proxy(self.uri)
+        print('jk')
+
     def cadastraPessoa(self, nome, numero):
         try:
             #self.pessoas.append(pessoa.Pessoa(nome,numero))
@@ -25,11 +27,12 @@ class Filial(object):
             d['idOrigem'] = self.id
             self.servidor.salvaOrigem(d)
             print("dado cadastrado")
+
         except:
             print("Verificar o servidor")
     def aluga(self, nome, numero):
         for i in self.pessoas:
-            if i['nome'] == nome and i['numero'] == numero and (self.consultaDebito(i['nome'],i['numero']) == False):
+            if i['nome'] == nome and i['numero'] == numero and (self.consultaDebito(i['nome'],i['numero']== False)):
                 d = {}
                 d['cliente'] = i
                 d['debito'] = True
@@ -45,13 +48,17 @@ class Filial(object):
         return None
 
     def devolve(self,nome,numero):
-        cli = self.procuraCliente(nome,numero)
+        cli = self.procuraCliente(nome, numero)
         if cli is not None:
             for i in self.debitos:
                 if i['cliente'] == cli:
                     self.debitos.remove(i)
                     pass
-        print("Cliente não encontrado na base")
+        else:
+            print("Devolvendo em outra filial")
+            result = self.servidor.getDebitos({"nome": nome, "numero": numero})
+            print(result)
+            return result
 
 
     def consultaDebito(self, nome, numero):
@@ -61,7 +68,9 @@ class Filial(object):
                 if i['cliente'] == cli:
                     return True
             return False
-        return False
+        else:
+            print("Procurando em outra filial...")
+            return self.servidor.getDebitos({"nome":nome,"numero":numero})
 
     def loadJson(self):
         try:
@@ -89,13 +98,15 @@ class Filial(object):
         return self.debitos
     def getId(self):
         return self.id
+    def servidorOi(self):
+        self.servidor.oi()
 
 def main():
     Pyro4.Daemon.serveSimple(
             {
                 Filial: "example.filial"
             },
-            ns = False)
+        host="127.0.0.1", port=8000, ns=False, verbose=True)
 
     '''filial = Filial()
     filial.cadastraPessoa("A", 22)

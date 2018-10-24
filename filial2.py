@@ -45,14 +45,18 @@ class Filial(object):
                 return i
         return None
 
+
     def devolve(self,nome,numero):
-        cli = self.procuraCliente(nome,numero)
+        cli = self.procuraCliente(nome, numero)
         if cli is not None:
             for i in self.debitos:
                 if i['cliente'] == cli:
                     self.debitos.remove(i)
                     pass
-        print("Cliente não encontrado na base")
+        else:
+            print("Devolvendo em outra filial")
+            return self.servidor.getDebitos({"nome": nome, "numero": numero})
+
 
 
     def consultaDebito(self, nome, numero):
@@ -62,7 +66,9 @@ class Filial(object):
                 if i['cliente'] == cli:
                     return True
             return False
-        return False
+        else:
+            print("Procurando em outra filial.. .")
+            return self.servidor.getDebitos({"nome":nome,"numero":numero})
 
     def loadJson(self):
         try:
@@ -97,7 +103,7 @@ def main():
             {
                 Filial: "example.filial2"
             },
-            ns = False)
+        host="127.0.0.1", port=8001, ns=False, verbose=True)
 
 if __name__=="__main__":
     main()
