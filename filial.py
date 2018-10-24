@@ -3,7 +3,7 @@ import Pyro4
 import json
 
 @Pyro4.expose
-@Pyro4.behavior(instance_mode="single")
+#@Pyro4.behavior(instance_mode="single")
 class Filial(object):
     veiculos = []
     pessoas = None
@@ -32,7 +32,7 @@ class Filial(object):
             print("Verificar o servidor")
     def aluga(self, nome, numero):
         for i in self.pessoas:
-            if i['nome'] == nome and i['numero'] == numero and (self.consultaDebito(i['nome'],i['numero']== False)):
+            if (i['nome'] == nome and i['numero'] == numero) and (self.consultaDebito(i['nome'],i['numero'])== False):
                 d = {}
                 d['cliente'] = i
                 d['debito'] = True

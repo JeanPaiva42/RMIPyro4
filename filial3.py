@@ -15,7 +15,7 @@ class Filial(object):
         self.veiculos = ['fusca', 'opala', 'ogromovel']
         self.loadJson()
         self.id = '3'
-        self.uri = "PYRO:example.servidor@localhost:59982"
+        self.uri = "PYRO:example.servidor@127.0.0.1:8080"
         self.servidor = Pyro4.Proxy(self.uri)
     def cadastraPessoa(self, nome, numero):
         try:

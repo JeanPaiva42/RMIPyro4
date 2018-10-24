@@ -20,6 +20,7 @@ class Server(object):
         pass
 
     def getDebitos(self, dicc):
+        print("Consultado debitos de filiais ")
         if self.ready == False:
             self.enderecos = {"1": "PYRO:example.filial@127.0.0.1:8000", "2": "PYRO:example.filial2@127.0.0.1:8001",
                               "3": "PYRO:example.filial3@127.0.0.1:8002"}
@@ -86,7 +87,7 @@ class Server(object):
             self.cadastrados = []
 
     def saveJson(self):
-        with open("cadastrosServerjson", "w") as write_file:
+        with open("cadastrosServer.json", "+w") as write_file:
             json.dump(self.cadastrados, write_file)
     def oi(self):
         print('koe')
