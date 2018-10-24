@@ -26,7 +26,10 @@ class Filial(object):
         self.servidor = Pyro4.Proxy(self.uri)
     def cadastraPessoa(self, nome, numero):
         try:
-            #self.pessoas.append(pessoa.Pessoa(nome,numero))
+            # self.pessoas.append(pessoa.Pessoa(nome,numero))
+            for i in self.pessoas:  # se ja cadastrado deixa quieto
+                if (i['nome'] == nome and i['numero'] == numero):
+                    return
             d = {"nome": nome, "numero": numero}
             self.pessoas.append(d)
             d['idOrigem'] = self.id
