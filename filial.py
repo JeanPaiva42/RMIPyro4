@@ -1,22 +1,19 @@
 import pessoa
-import jsonpickle
+import Pyro4
 import json
 
-
+@Pyro4.expose
+@Pyro4.behavior(instance_mode="single")
 class Filial(object):
     veiculos = []
     pessoas = None
     debitos = None
-
     def __init__(self):
         self.veiculos = ['fusca', 'opala', 'ogromovel']
         self.pessoas = []
         self.debitos = []
-
-    def cadastraPessoa(self, nome):
-            persona = pessoa.Pessoa(nome)
-            self.pessoas.append(pessoa.Pessoa(nome))
-            return persona
+    def cadastraPessoa(self, nome, numero):
+            self.pessoas.append(pessoa.Pessoa(nome,numero))
 
     def aluga(self, nome, numero):
         for i in self.pessoas:
@@ -34,8 +31,8 @@ class Filial(object):
                 return i
         return None
 
-    def devolve(self, nome, numero):
-        cli = self.procuraCliente(nome, numero)
+    def devolve(self,nome,numero):
+        cli = self.procuraCliente(nome,numero)
         if cli is not None:
             for i in self.debitos:
                 if i['cliente'] == cli:
@@ -43,8 +40,9 @@ class Filial(object):
                     pass
         print("Cliente não encontrado na base")
 
+
     def consultaDebito(self, nome, numero):
-        cli = self.procuraCliente(nome, numero)
+        cli = self.procuraCliente(nome,numero)
         if cli is not None:
             for i in self.debitos:
                 if i['cliente'] == cli:
@@ -60,15 +58,16 @@ class Filial(object):
 
     def saveJson(self):
         with open("debitos.json", "w") as write_file:
-            write_file.write(jsonpickle.encode(self.debitos))
+            write_file.write(json.encode(self.debitos))
         with open("pessoas.json", "w") as write_file:
-            write_file.write(jsonpickle.encode(self.pessoas))
+            write_file.write(json.encode(self.pessoas))
 
-if __name__ == '__main__':
-    filial = Filial()
-    filial.loadJson()
-    pessoa = filial.cadastraPessoa("htva")
-    print(pessoa.getNome()+ ": " + str(pessoa.getNumero()))
-    filial.aluga("hugao", pessoa.getNumero())
-    
-    filial.saveJson()
+def main():
+    Pyro4.Daemon.serveSimple(
+            {
+                Filial: "example.filial"
+            },
+            ns = True)
+
+if __name__=="__main__":
+    main()
