@@ -3,15 +3,17 @@ import Pyro4
 import json
 import threading
 
+
 def startServer():
-	Pyro4.Daemon.serveSimple(
-		    {
-		        Filial: "example.filial"
-		    },
-		host="127.0.0.1", port=8000, ns=True, verbose=True)
+    Pyro4.Daemon.serveSimple(
+        {
+            Filial: "example.filial"
+        },
+        host="127.0.0.1", port=8000, ns=False, verbose=True)
+
 
 @Pyro4.expose
-#@Pyro4.behavior(instance_mode="single")
+# @Pyro4.behavior(instance_mode="single")
 class Filial(object):
     veiculos = []
     pessoas = None
@@ -19,6 +21,7 @@ class Filial(object):
     id = None
     uri = None
     servidor = None
+
     def __init__(self):
         self.veiculos = ['fusca', 'opala', 'ogromovel']
         self.loadJson()
@@ -29,7 +32,7 @@ class Filial(object):
 
     def cadastraPessoa(self, nome, numero):
         try:
-            #self.pessoas.append(pessoa.Pessoa(nome,numero))
+            # self.pessoas.append(pessoa.Pessoa(nome,numero))
             d = {"nome": nome, "numero": numero}
             self.pessoas.append(d)
             d['idOrigem'] = self.id
@@ -38,13 +41,20 @@ class Filial(object):
 
         except:
             print("Verificar o servidor")
+
     def aluga(self, nome, numero):
         for i in self.pessoas:
-            if (i['nome'] == nome and i['numero'] == numero) and (self.consultaDebito(i['nome'],i['numero'])== False):
+            if (i['nome'] == nome and i['numero'] == numero) and (self.consultaDebito(i['nome'], i['numero']) == False):
                 d = {}
                 d['cliente'] = i
                 d['debito'] = True
-                self.debitos.append(d)
+                cli = self.procuraCliente(i['nome'],i['numero'])
+                if cli is not None:
+                    self.debitos.append(d)
+                    self.saveJson()
+                    self.loadJson()
+                else:
+                    self.servidor.alugaServer(d)
                 pass
 
         print("Cliente não encontrado na base")
@@ -55,7 +65,7 @@ class Filial(object):
                 return i
         return None
 
-    def devolve(self,nome,numero):
+    def devolve(self, nome, numero):
         cli = self.procuraCliente(nome, numero)
         if cli is not None:
             for i in self.debitos:
@@ -68,9 +78,8 @@ class Filial(object):
             print(result)
             return result
 
-
     def consultaDebito(self, nome, numero):
-        cli = self.procuraCliente(nome,numero)
+        cli = self.procuraCliente(nome, numero)
         if cli is not None:
             for i in self.debitos:
                 if i['cliente'] == cli:
@@ -78,7 +87,7 @@ class Filial(object):
             return False
         else:
             print("Procurando em outra filial...")
-            return self.servidor.getDebitos({"nome":nome,"numero":numero})
+            return self.servidor.getDebitos({"nome": nome, "numero": numero})
 
     def loadJson(self):
         try:
@@ -100,32 +109,37 @@ class Filial(object):
 
     def getVeiculos(self):
         return self.veiculos
+
     def getPessoas(self):
         return self.pessoas
+
     def getDebitos(self):
         return self.debitos
+
     def getId(self):
         return self.id
+
     def servidorOi(self):
         self.servidor.oi()
 
+
 def main():
-    
-    
+
     t = threading.Thread(target=startServer)
     t.start()
-    filial = Filial()
+    '''filial = Filial()
     filial.cadastraPessoa("A", 22)
     filial.cadastraPessoa("b", 22)
     filial.cadastraPessoa("c", 22)
-    filial.aluga("b",22)
-    filial.aluga("c",22)
+    filial.aluga("b", 22)
+    filial.aluga("c", 22)
     print(filial.pessoas)
     print(filial.debitos)
-    filial.devolve("b",22)
-    filial.devolve("aa",22)
+    filial.devolve("b", 22)
+    filial.devolve("aa", 22)
     print(filial.debitos)
     filial.saveJson()
+'''
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()

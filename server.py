@@ -7,7 +7,7 @@ def startServer():
 		    {
 		        Server: "example.servidor"
 		    },
-		host="127.0.0.1", port=8000, ns=True, verbose=True)
+		host="127.0.0.1", port=8080, ns=False, verbose=True)
 @Pyro4.expose
 @Pyro4.behavior(instance_mode="single")
 class Server(object):
@@ -50,6 +50,28 @@ class Server(object):
                     return self.filial3.consultaDebito(i['nome'], i['numero'])
         pass
 
+    def alugaServer(self, dicc):
+        print("Alugando remotamente ")
+        if self.ready == False:
+            self.enderecos = {"1": "PYRO:example.filial@127.0.0.1:8000", "2": "PYRO:example.filial2@127.0.0.1:8001",
+                              "3": "PYRO:example.filial3@127.0.0.1:8002"}
+            self.uri = self.enderecos['1']
+            self.filial = Pyro4.Proxy(self.uri)
+            self.uri2 = self.enderecos['2']
+            self.filial2 = Pyro4.Proxy(self.uri2)
+            self.uri3 = self.enderecos['3']
+            self.filial3 = Pyro4.Proxy(self.uri3)
+            self.ready = True
+        print("Alugando na filial correta")
+        for i in self.cadastrados:
+            if i['nome'] == dicc['nome'] and i['numero'] == dicc['numero']:
+                if (i['idOrigem'] == '1'):
+                    return self.filial.aluga(i['nome'], i['numero'])
+                if (i['idOrigem'] == '2'):
+                    return self.filial2.aluga(i['nome'], i['numero'])
+                if (i['idOrigem'] == '3'):
+                    return self.filial3.aluga(i['nome'], i['numero'])
+        pass
     def salvaOrigem(self, dicc):
         self.cadastrados.append(dicc)
         self.saveJson()
@@ -95,7 +117,7 @@ class Server(object):
             self.cadastrados = []
 
     def saveJson(self):
-        with open("cadastrosServer.json", "+w") as write_file:
+        with open("cadastrosServer.json", "w") as write_file:
             json.dump(self.cadastrados, write_file)
     def oi(self):
         print('koe')

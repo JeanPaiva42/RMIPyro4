@@ -1,7 +1,14 @@
 import pessoa
 import Pyro4
 import json
+import threading
 
+def startServer():
+	Pyro4.Daemon.serveSimple(
+		    {
+		        Filial: "example.filial2"
+		    },
+		host="127.0.0.1", port=8001, ns=False, verbose=True)
 @Pyro4.expose
 @Pyro4.behavior(instance_mode="single")
 class Filial(object):
@@ -31,13 +38,23 @@ class Filial(object):
 
     def aluga(self, nome, numero):
         for i in self.pessoas:
-            if i['nome'] == nome and i['numero'] == numero and (self.consultaDebito(i['nome'],i['numero']) == False):
+            if (i['nome'] == nome and i['numero'] == numero) and (self.consultaDebito(i['nome'], i['numero']) == False):
                 d = {}
                 d['cliente'] = i
                 d['debito'] = True
-                self.debitos.append(d)
+                cli = self.procuraCliente(i['nome'],i['numero'])
+                if cli is not None:
+                    self.debitos.append(d)
+                    self.saveJson()
+                    self.loadJson()
+                else:
+                    self.servidor.alugaServer(d)
+
                 pass
+
         print("Cliente não encontrado na base")
+
+
 
     def procuraCliente(self, nome, numero):
         for i in self.pessoas:
@@ -99,11 +116,8 @@ class Filial(object):
         return self.id
 
 def main():
-    Pyro4.Daemon.serveSimple(
-            {
-                Filial: "example.filial2"
-            },
-        host="127.0.0.1", port=8001, ns=False, verbose=True)
+    t = threading.Thread(target=startServer)
+    t.start()
 
 if __name__=="__main__":
     main()
