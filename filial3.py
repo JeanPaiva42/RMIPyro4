@@ -14,12 +14,12 @@ class Filial(object):
     def __init__(self):
         self.veiculos = ['fusca', 'opala', 'ogromovel']
         self.loadJson()
-        self.id = '1'
-        self.uri = "PYRO:example.servidor@localhost:61443"
+        self.id = '3'
+        self.uri = "PYRO:example.servidor@localhost:59982"
         self.servidor = Pyro4.Proxy(self.uri)
     def cadastraPessoa(self, nome, numero):
         try:
-            #self.pessoas.append(pessoa.Pessoa(nome,numero))
+            # self.pessoas.append(pessoa.Pessoa(nome,numero))
             d = {"nome": nome, "numero": numero}
             self.pessoas.append(d)
             d['idOrigem'] = self.id
@@ -27,6 +27,7 @@ class Filial(object):
             print("dado cadastrado")
         except:
             print("Verificar o servidor")
+
     def aluga(self, nome, numero):
         for i in self.pessoas:
             if i['nome'] == nome and i['numero'] == numero and (self.consultaDebito(i['nome'],i['numero']) == False):
@@ -35,7 +36,6 @@ class Filial(object):
                 d['debito'] = True
                 self.debitos.append(d)
                 pass
-
         print("Cliente não encontrado na base")
 
     def procuraCliente(self, nome, numero):
@@ -65,21 +65,22 @@ class Filial(object):
 
     def loadJson(self):
         try:
-            with open("debitos.json", "r") as read_file:
+            with open("debitos3.json", "r") as read_file:
                 self.debitos = json.load(read_file)
         except:
             self.debitos = []
         try:
-            with open("pessoas.json", "r") as read_file:
+            with open("pessoas3.json", "r") as read_file:
                 self.pessoas = json.load(read_file)
         except:
             self.pessoas = []
 
     def saveJson(self):
-        with open("debitos.json", "w") as write_file:
+        with open("debitos3.json", "w") as write_file:
             json.dump(self.debitos, write_file)
-        with open("pessoas.json", "w") as write_file:
+        with open("pessoas3.json", "w") as write_file:
             json.dump(self.pessoas, write_file)
+
 
     def getVeiculos(self):
         return self.veiculos
@@ -89,27 +90,12 @@ class Filial(object):
         return self.debitos
     def getId(self):
         return self.id
-
 def main():
     Pyro4.Daemon.serveSimple(
             {
-                Filial: "example.filial"
+                Filial: "example.filial3"
             },
             ns = False)
-
-    '''filial = Filial()
-    filial.cadastraPessoa("A", 22)
-    filial.cadastraPessoa("b", 22)
-    filial.cadastraPessoa("c", 22)
-    filial.aluga("b",22)
-    filial.aluga("c",22)
-    print(filial.pessoas)
-    print(filial.debitos)
-    filial.devolve("b",22)
-    filial.devolve("aa",22)
-    print(filial.debitos)
-    filial.saveJson()
-'''
 
 if __name__=="__main__":
     main()

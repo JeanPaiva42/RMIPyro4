@@ -2,8 +2,8 @@ import sys
 import Pyro4
 import pessoa
 
-uri = "PYRO:example.filial@localhost:51977"
 #input("Enter the uri of the warehouse: ").strip()
+uri = "PYRO:example.filial@localhost:61478"
 filial = Pyro4.Proxy(uri)
 
 #filial.procuraCliente("JJ",11)
